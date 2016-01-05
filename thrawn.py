@@ -17,9 +17,9 @@ class ThrawnConfig:
 
     def tconfig_save_default(self):
         self.tconfig_map = {'Terminal': 'xfce4-terminal',
-                           'Terminal exec option flag': '-x',
-                           'Height': 24,
-                           'Focus keys': ['Control_L', 'Shift_L']}
+                            'Terminal exec option flag': '-x',
+                            'Height': 24,
+                            'Focus keys': ['Control_L', 'Shift_L']}
         self.tconfig_save()
 
     @property
@@ -229,10 +229,9 @@ class CommandLineEdit(QLineEdit):
             self.command_run(completion_list[0])
 
     def command_run(self, command):
-        os.popen('{terminal} {exec_flag} {command}'.format(
-                terminal=self.tconfig.terminal,
-                exec_flag=self.tconfig.terminal_exec_flag,
-                command=command))
+        os.popen(self.tconfig.terminal + ' ' +
+                 self.tconfig.terminal_exec_flag + ' ' +
+                 command)
 
     def get_exec_list(self):
         exec_list = []
