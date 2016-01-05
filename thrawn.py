@@ -135,7 +135,7 @@ class XInputThread(QThread):
     def run(self):
         # Check if the extension is present
         if not self.record_dpy.has_extension("RECORD"):
-            logging.error("RECORD extension not found")
+            logging.critical("RECORD extension not found")
             sys.exit(1)
 
         # Create a recording context; we only want key and mouse events
