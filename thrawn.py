@@ -59,16 +59,16 @@ class ThrawnConfig:
         self.config_save()
 
     def config_save(self):
-        home = self.get_home_path()
-        conf_path = '{home_path}/.config/thrawn/thrawn.conf'.format(home_path=home)
-        self.dir_check(os.path.dirname(conf_path))
-        with open(conf_path, 'w') as f:
+        config_path = self.get_config_path()
+        config_path += '/thrawn/thrawn.conf'
+        self.dir_check(os.path.dirname(config_path))
+        with open(config_path, 'w') as f:
             json.dump(self.config_map, f)
 
     def config_load(self):
-        home = self.get_home_path()
+        config_path = self.get_config_path()
         try:
-            with open('{home_path}/.config/thrawn/thrawn.conf'.format(home_path=home)) as f:
+            with open('{config_path}/thrawn/thrawn.conf'.format(config_path=config_path)) as f:
                 self.config_map = json.load(f)
         except FileNotFoundError:
             logging.info('Configuration file not found, writing a default one')
@@ -78,11 +78,18 @@ class ThrawnConfig:
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-    def get_home_path(self):
-        home = os.getenv('HOME')
-        if not home:
-            logging.error('HOME variable not defined')
-        return home
+    def get_config_path(self):
+        xdg_home = os.getenv('XDG_CONFIG_HOME')
+        if xdg_home:
+            config_path = xdg_home
+        else:
+            home = os.getenv('HOME')
+            if not home:
+                logging.critical('HOME variable not defined')
+                sys.exit(1)
+            else:
+                config_path = home + '/.config'
+        return config_path
 
 
 # FROM https://gist.github.com/whym/402801#file-keylogger-py
@@ -175,6 +182,11 @@ class Panel(QWidget):
 
         command_line_edit = CommandLineEdit(self, command_label, self.thrawn_config)
 
+
+class BuiltInCommands:
+    @staticmethod
+    def thrawn_quit():
+        QCoreApplication.instance().quit()
 
 
 class CommandLineEdit(QLineEdit):
