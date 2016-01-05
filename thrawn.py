@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QLineEdit
 from PyQt5.QtWidgets import QLabel
 
 
-class Thrawntconfig:
+class ThrawnConfig:
     def __init__(self):
         self.tconfig_map = {}
         self.tconfig_load()
@@ -273,7 +273,7 @@ class CommandsLabel(QLabel):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    tconfig = Thrawntconfig()
+    tconfig = ThrawnConfig()
 
     panel = Panel(tconfig)
     panel.show()
