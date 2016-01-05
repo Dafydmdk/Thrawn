@@ -225,8 +225,11 @@ class CommandLineEdit(QLineEdit):
         completion_list = self.get_completion()
         if self.text() in completion_list:
             self.command_run(self.text())
-        else:
+        elif completion_list:
             self.command_run(completion_list[0])
+        else:
+            self.command_run(self.text())
+
 
     def command_run(self, command):
         os.popen(self.tconfig.terminal + ' ' +
