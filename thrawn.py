@@ -1,4 +1,5 @@
 import sys
+import sys
 import os
 import logging
 import json
@@ -93,7 +94,7 @@ class XInputThread(QThread):
         for name in dir(XK):
             if name[:3] == "XK_" and getattr(XK, name) == keysym:
                 return name[3:]
-        return "[%d]" % keysym
+        return '[{key}]'.format(key=keysym)
 
     def record_callback(self, reply):
         if reply.category != record.FromServer:
