@@ -204,15 +204,20 @@ class CommandLineEdit(QLineEdit):
         self.setFocus(Qt.OtherFocusReason)
 
     def init_signals(self):
-        self.returnPressed.connect(self.command_run)
+        self.returnPressed.connect(self.command_choose)
         self.textChanged.connect(self.change_command_label_text)
 
-    def command_run(self):
+    def command_choose(self):
         completion_list = self.get_completion()
         if self.text() in completion_list:
-            os.popen('{terminal} {exec_flag} {command}'.format(terminal=self.thrawn_config.terminal,
-                                                               exec_flag=self.thrawn_config.terminal_exec_flag,
-                                                               command=completion_list[0]))
+            self.command_run(self.text())
+        else:
+            self.command_run(completion_list[0])
+
+    def command_run(self, command):
+        os.popen('{terminal} {exec_flag} {command}'.format(terminal=self.thrawn_config.terminal,
+                                                           exec_flag=self.thrawn_config.terminal_exec_flag,
+                                                           command=command))
 
     def get_exec_list(self):
         exec_list = []
