@@ -7,7 +7,7 @@ from Xlib import X, XK, display
 from Xlib.ext import record
 from Xlib.protocol import rq
 from PyQt5.QtCore import Qt, QCoreApplication, QThread
-from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QPushButton, QLineEdit, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QLineEdit, QLabel
 
 
 class ThrawnConfig:
@@ -59,14 +59,14 @@ class ThrawnConfig:
         self.config_save()
 
     def config_save(self):
-        home = os.getenv('HOME')
+        home = self.get_home_path()
         conf_path = '{home_path}/.config/thrawn/thrawn.conf'.format(home_path=home)
         self.dir_check(os.path.dirname(conf_path))
         with open(conf_path, 'w') as f:
             json.dump(self.config_map, f)
 
     def config_load(self):
-        home = os.getenv('HOME')
+        home = self.get_home_path()
         try:
             with open('{home_path}/.config/thrawn/thrawn.conf'.format(home_path=home)) as f:
                 self.config_map = json.load(f)
@@ -77,6 +77,12 @@ class ThrawnConfig:
     def dir_check(self, directory):
         if not os.path.exists(directory):
             os.makedirs(directory)
+
+    def get_home_path(self):
+        home = os.getenv('HOME')
+        if not home:
+            logging.error('HOME variable not defined')
+        return home
 
 
 # FROM https://gist.github.com/whym/402801#file-keylogger-py
@@ -165,28 +171,10 @@ class Panel(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.move(0, 0)
 
-        quit_button = QuitButton(self, self.thrawn_config)
-
         command_label = CommandsLabel(self, self.thrawn_config)
 
         command_line_edit = CommandLineEdit(self, command_label, self.thrawn_config)
 
-
-class QuitButton(QPushButton):
-    def __init__(self, parent, thrawn_config):
-        super().__init__(parent)
-        self.parent = parent
-        self.thrawn_config = thrawn_config
-        self.init_ui()
-        self.init_signals()
-
-    def init_ui(self):
-        self.resize(32, self.thrawn_config.height)
-        self.move(self.parent.width() - self.width(), 0)
-        self.setText('Quit')
-
-    def init_signals(self):
-        self.clicked.connect(QCoreApplication.instance().quit)
 
 
 class CommandLineEdit(QLineEdit):
@@ -244,8 +232,9 @@ class CommandsLabel(QLabel):
         self.init_ui()
 
     def init_ui(self):
+        screen = QDesktopWidget().availableGeometry()
         self.move(310, 0)
-        self.resize(1000, self.thrawn_config.height)
+        self.resize(screen.width() - self.width(), self.thrawn_config.height)
 
 
 if __name__ == '__main__':
