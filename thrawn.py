@@ -223,7 +223,8 @@ class CommandLineEdit(QLineEdit):
                 for _, _, list_file in os.walk(directory):
                     exec_list += list_file
         else:
-            logging.error('PATH environment variable not set, unable to get executable list')
+            logging.critical('PATH environment variable not set, unable to get executable list')
+            sys.exit(1)
         return exec_list
 
     def get_completion(self):
