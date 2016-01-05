@@ -59,17 +59,23 @@ class ThrawnConfig:
 
     def config_save(self):
         home = os.getenv('HOME')
-        with open('%s/.config/thrawn/thrawn.conf' % home, 'w') as f:
+        conf_path = '{home_path}/.config/thrawn/thrawn.conf'.format(home_path=home)
+        self.dir_check(os.path.dirname(conf_path))
+        with open(conf_path, 'w') as f:
             json.dump(self.config_map, f)
 
     def config_load(self):
         home = os.getenv('HOME')
         try:
-            with open('%s/.config/thrawn/thrawn.conf' % home) as f:
+            with open('{home_path}/.config/thrawn/thrawn.conf'.format(home_path=home)) as f:
                 self.config_map = json.load(f)
         except FileNotFoundError:
             logging.info('Configuration file not found, writing a default one')
             self.config_save_default()
+
+    def dir_check(self, dir):
+        if not os.path.exists(dir):
+            os.makedirs(dir)
 
 
 # FROM https://gist.github.com/whym/402801#file-keylogger-py
@@ -203,9 +209,9 @@ class CommandLineEdit(QLineEdit):
     def command_run(self):
         completion_list = self.get_completion()
         if self.text() in completion_list:
-            os.popen('%s ' % self.thrawn_config.terminal +
-                     '%s ' % self.thrawn_config.terminal_exec_flag +
-                     completion_list[0])
+            os.popen('{terminal} {exec_flag} {command}'.format(terminal=self.thrawn_config.terminal,
+                                                               exec_flag=self.thrawn_config.terminal_exec_flag,
+                                                               command=completion_list[0]))
 
     def get_exec_list(self):
         exec_list = []
