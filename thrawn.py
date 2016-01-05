@@ -74,9 +74,9 @@ class ThrawnConfig:
             logging.info('Configuration file not found, writing a default one')
             self.config_save_default()
 
-    def dir_check(self, dir):
-        if not os.path.exists(dir):
-            os.makedirs(dir)
+    def dir_check(self, directory):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
 
 # FROM https://gist.github.com/whym/402801#file-keylogger-py
