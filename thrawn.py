@@ -68,11 +68,11 @@ class ThrawnConfig:
     def tconfig_load(self):
         tconfig_path = self.get_tconfig_path()
         try:
-            with open('{tconfig_path}/thrawn/thrawn.conf'.format(
-                    tconfig_path=tconfig_path)) as f:
+            with open(tconfig_path + '/thrawn/thrawn.conf') as f:
                 self.tconfig_map = json.load(f)
         except FileNotFoundError:
-            logging.info('tconfiguration file not found, writing a default one')
+            logging.warning('configuration file not found, \
+                             writing a default one')
             self.tconfig_save_default()
 
     def dir_check(self, directory):
