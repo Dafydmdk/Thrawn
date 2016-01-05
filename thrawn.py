@@ -95,12 +95,12 @@ class Thrawntconfig:
 
 # FROM https://gist.github.com/whym/402801#file-keylogger-py
 class XInputThread(QThread):
-    def __init__(self, thrawn_panel, tconfig):
+    def __init__(self, panel, tconfig):
         QThread.__init__(self)
         self.local_dpy = display.Display()
         self.record_dpy = display.Display()
         self.tconfig = tconfig
-        self.thrawn_panel = thrawn_panel
+        self.panel = panel
         self.keymap = self.tconfig.focus_keymap
         self.received_keys = list()
 
@@ -132,7 +132,7 @@ class XInputThread(QThread):
                         if received_key not in self.received_keys:
                             self.received_keys.append(received_key)
                             if len(self.received_keys) == 2:
-                                self.thrawn_panel.activateWindow()
+                                self.panel.activateWindow()
                                 self.received_keys.clear()
 
     def run(self):
