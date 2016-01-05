@@ -5,8 +5,9 @@ import json
 from Xlib import X, XK, display
 from Xlib.ext import record
 from Xlib.protocol import rq
-from PyQt5.QtCore import Qt, QCoreApplication, QThread
-from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QLineEdit, QLabel
+from PyQt5.QtCore import Qt, QThread
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QLineEdit
+from PyQt5.QtWidgets import QLabel
 
 
 class ThrawnConfig:
@@ -67,7 +68,8 @@ class ThrawnConfig:
     def config_load(self):
         config_path = self.get_config_path()
         try:
-            with open('{config_path}/thrawn/thrawn.conf'.format(config_path=config_path)) as f:
+            with open('{config_path}/thrawn/thrawn.conf'.format(
+                    config_path=config_path)) as f:
                 self.config_map = json.load(f)
         except FileNotFoundError:
             logging.info('Configuration file not found, writing a default one')
@@ -112,7 +114,7 @@ class XInputThread(QThread):
         if reply.category != record.FromServer:
             return
         elif reply.client_swapped:
-            logging.warning("* received swapped protocol data, cowardly ignored")
+            logging.warning("Received swapped protocol data, cowardly ignored")
             return
         elif not len(reply.data) or ord(str(reply.data[0])) < 2:
             # not an event
@@ -120,16 +122,18 @@ class XInputThread(QThread):
 
         data = reply.data
         while len(data):
-            event, data = rq.EventField(None).parse_binary_value(data, self.record_dpy.display, None, None)
+            event, data = rq.EventField(None).parse_binary_value(
+                    data, self.record_dpy.display, None, None)
             if event.type in [X.KeyPress, X.KeyRelease]:
                 keysym = self.local_dpy.keycode_to_keysym(event.detail, 0)
                 if keysym:
                     received_key = self.lookup_keysym(keysym)
-                    if received_key in self.keymap and received_key not in self.received_keys:
-                        self.received_keys.append(received_key)
-                        if len(self.received_keys) == 2:
-                            self.thrawn_panel.activateWindow()
-                            self.received_keys.clear()
+                    if received_key in self.keymap :
+                        if received_key not in self.received_keys:
+                            self.received_keys.append(received_key)
+                            if len(self.received_keys) == 2:
+                                self.thrawn_panel.activateWindow()
+                                self.received_keys.clear()
 
     def run(self):
         # Check if the extension is present
@@ -153,7 +157,8 @@ class XInputThread(QThread):
                     'client_died': False
                 }])
 
-        # Enable the context; this only returns after a call to record_disable_context,
+        # Enable the context; this only returns after
+        # a call to record_disable_context,
         # while calling the callback function in the meantime
         self.record_dpy.record_enable_context(ctx, self.record_callback)
 
@@ -179,13 +184,23 @@ class Panel(QWidget):
 
         command_label = CommandsLabel(self, self.thrawn_config)
 
-        command_line_edit = CommandLineEdit(self, command_label, self.thrawn_config)
+        command_line_edit = CommandLineEdit(self, command_label,
+                                            self.thrawn_config)
 
 
 class BuiltInCommands:
     @staticmethod
+    def built_in_commands_dict():
+        built_in_commands = {}
+        met_names = list((el for el in BuiltInCommands.__dict__ if
+                          el.find('__') and el.find('built_in_commands_dict')))
+        for el in met_names:
+            built_in_commands[el] = 'BuiltInCommands.' + el + '()'
+        return built_in_commands
+
+    @staticmethod
     def thrawn_quit():
-        QCoreApplication.instance().quit()
+        sys.exit(0)
 
 
 class CommandLineEdit(QLineEdit):
@@ -214,9 +229,10 @@ class CommandLineEdit(QLineEdit):
             self.command_run(completion_list[0])
 
     def command_run(self, command):
-        os.popen('{terminal} {exec_flag} {command}'.format(terminal=self.thrawn_config.terminal,
-                                                           exec_flag=self.thrawn_config.terminal_exec_flag,
-                                                           command=command))
+        os.popen('{terminal} {exec_flag} {command}'.format(
+                terminal=self.thrawn_config.terminal,
+                exec_flag=self.thrawn_config.terminal_exec_flag,
+                command=command))
 
     def get_exec_list(self):
         exec_list = []
@@ -227,7 +243,7 @@ class CommandLineEdit(QLineEdit):
                 for _, _, list_file in os.walk(directory):
                     exec_list += list_file
         else:
-            logging.critical('PATH environment variable not set, unable to get executable list')
+            logging.critical('PATH environment variable not set')
             sys.exit(1)
         return exec_list
 
