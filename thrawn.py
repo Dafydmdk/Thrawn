@@ -10,98 +10,98 @@ from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QLineEdit
 from PyQt5.QtWidgets import QLabel
 
 
-class ThrawnConfig:
+class Thrawntconfig:
     def __init__(self):
-        self.config_map = {}
-        self.config_load()
+        self.tconfig_map = {}
+        self.tconfig_load()
 
-    def config_save_default(self):
-        self.config_map = {'Terminal': 'xfce4-terminal',
+    def tconfig_save_default(self):
+        self.tconfig_map = {'Terminal': 'xfce4-terminal',
                            'Terminal exec option flag': '-x',
                            'Height': 24,
                            'Focus keys': ['Control_L', 'Shift_L']}
-        self.config_save()
+        self.tconfig_save()
 
     @property
     def focus_keymap(self):
-        return self.config_map['Focus keys']
+        return self.tconfig_map['Focus keys']
 
     @focus_keymap.setter
     def focus_keymap(self, focus_keymap):
-        self.config_map['Focus keys'] = focus_keymap
-        self.config_save()
+        self.tconfig_map['Focus keys'] = focus_keymap
+        self.tconfig_save()
 
     @property
     def terminal(self):
-        return self.config_map['Terminal']
+        return self.tconfig_map['Terminal']
 
     @terminal.setter
     def terminal(self, terminal):
-        self.config_map['Terminal'] = terminal
-        self.config_save()
+        self.tconfig_map['Terminal'] = terminal
+        self.tconfig_save()
 
     @property
     def terminal_exec_flag(self):
-        return self.config_map['Terminal exec option flag']
+        return self.tconfig_map['Terminal exec option flag']
 
     @terminal_exec_flag.setter
     def terminal_exec_flag(self, terminal_exec_flag):
-        self.config_map['Terminal exec option flag'] = terminal_exec_flag
-        self.config_save()
+        self.tconfig_map['Terminal exec option flag'] = terminal_exec_flag
+        self.tconfig_save()
 
     @property
     def height(self):
-        return self.config_map['Height']
+        return self.tconfig_map['Height']
 
     @height.setter
     def height(self, height):
-        self.config_map['Height'] = height
-        self.config_save()
+        self.tconfig_map['Height'] = height
+        self.tconfig_save()
 
-    def config_save(self):
-        config_path = self.get_config_path()
-        config_path += '/thrawn/thrawn.conf'
-        self.dir_check(os.path.dirname(config_path))
-        with open(config_path, 'w') as f:
-            json.dump(self.config_map, f)
+    def tconfig_save(self):
+        tconfig_path = self.get_tconfig_path()
+        tconfig_path += '/thrawn/thrawn.conf'
+        self.dir_check(os.path.dirname(tconfig_path))
+        with open(tconfig_path, 'w') as f:
+            json.dump(self.tconfig_map, f)
 
-    def config_load(self):
-        config_path = self.get_config_path()
+    def tconfig_load(self):
+        tconfig_path = self.get_tconfig_path()
         try:
-            with open('{config_path}/thrawn/thrawn.conf'.format(
-                    config_path=config_path)) as f:
-                self.config_map = json.load(f)
+            with open('{tconfig_path}/thrawn/thrawn.conf'.format(
+                    tconfig_path=tconfig_path)) as f:
+                self.tconfig_map = json.load(f)
         except FileNotFoundError:
-            logging.info('Configuration file not found, writing a default one')
-            self.config_save_default()
+            logging.info('tconfiguration file not found, writing a default one')
+            self.tconfig_save_default()
 
     def dir_check(self, directory):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-    def get_config_path(self):
-        xdg_home = os.getenv('XDG_CONFIG_HOME')
+    def get_tconfig_path(self):
+        xdg_home = os.getenv('XDG_tconfig_HOME')
         if xdg_home:
-            config_path = xdg_home
+            tconfig_path = xdg_home
         else:
             home = os.getenv('HOME')
             if not home:
                 logging.critical('HOME variable not defined')
                 sys.exit(1)
             else:
-                config_path = home + '/.config'
-        return config_path
+                tconfig_path = home + '/.tconfig'
+        return tconfig_path
 
 
 # FROM https://gist.github.com/whym/402801#file-keylogger-py
 class XInputThread(QThread):
-    def __init__(self, thrawn_panel, thrawn_config):
+    def __init__(self, thrawn_panel, tconfig):
         QThread.__init__(self)
         self.local_dpy = display.Display()
         self.record_dpy = display.Display()
-        self.thrawn_config = thrawn_config
+        self.tconfig = tconfig
         self.thrawn_panel = thrawn_panel
-        self.keymap = self.thrawn_config.focus_keymap
+        self.keymap = self.tconfig.focus_keymap
         self.received_keys = list()
 
     def lookup_keysym(self, keysym):
@@ -169,23 +169,23 @@ class XInputThread(QThread):
 
 
 class Panel(QWidget):
-    def __init__(self, thrawn_config):
+    def __init__(self, tconfig):
         super().__init__()
-        self.thrawn_config = thrawn_config
+        self.tconfig = tconfig
         self.init_ui()
-        self.x_input_thread = XInputThread(self, thrawn_config)
+        self.x_input_thread = XInputThread(self, tconfig)
         self.x_input_thread.start()
 
     def init_ui(self):
         screen = QDesktopWidget().availableGeometry()
-        self.resize(screen.width(), self.thrawn_config.height)
+        self.resize(screen.width(), self.tconfig.height)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.move(0, 0)
 
-        command_label = CommandsLabel(self, self.thrawn_config)
+        command_label = CommandsLabel(self, self.tconfig)
 
         command_line_edit = CommandLineEdit(self, command_label,
-                                            self.thrawn_config)
+                                            self.tconfig)
 
 
 class BuiltInCommands:
@@ -204,16 +204,16 @@ class BuiltInCommands:
 
 
 class CommandLineEdit(QLineEdit):
-    def __init__(self, parent, command_label, thrawn_config):
+    def __init__(self, parent, command_label, tconfig):
         super().__init__(parent)
-        self.thrawn_config = thrawn_config
+        self.tconfig = tconfig
         self.command_label = command_label
         self.exec_list = self.get_exec_list()
         self.init_ui()
         self.init_signals()
 
     def init_ui(self):
-        self.resize(300, self.thrawn_config.height)
+        self.resize(300, self.tconfig.height)
         self.move(0, 0)
         self.setFocus(Qt.OtherFocusReason)
 
@@ -230,8 +230,8 @@ class CommandLineEdit(QLineEdit):
 
     def command_run(self, command):
         os.popen('{terminal} {exec_flag} {command}'.format(
-                terminal=self.thrawn_config.terminal,
-                exec_flag=self.thrawn_config.terminal_exec_flag,
+                terminal=self.tconfig.terminal,
+                exec_flag=self.tconfig.terminal_exec_flag,
                 command=command))
 
     def get_exec_list(self):
@@ -259,23 +259,23 @@ class CommandLineEdit(QLineEdit):
 
 
 class CommandsLabel(QLabel):
-    def __init__(self, parent, thrawn_config):
+    def __init__(self, parent, tconfig):
         super().__init__(parent)
-        self.thrawn_config = thrawn_config
+        self.tconfig = tconfig
         self.init_ui()
 
     def init_ui(self):
         screen = QDesktopWidget().availableGeometry()
         self.move(310, 0)
-        self.resize(screen.width() - self.width(), self.thrawn_config.height)
+        self.resize(screen.width() - self.width(), self.tconfig.height)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    thrawn_config = ThrawnConfig()
+    tconfig = Thrawntconfig()
 
-    panel = Panel(thrawn_config)
+    panel = Panel(tconfig)
     panel.show()
 
     sys.exit(app.exec_())
