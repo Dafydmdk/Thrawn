@@ -80,7 +80,7 @@ class ThrawnConfig:
             os.makedirs(directory)
 
     def get_tconfig_path(self):
-        xdg_home = os.getenv('XDG_tconfig_HOME')
+        xdg_home = os.getenv('XDG_config_HOME')
         if xdg_home:
             tconfig_path = xdg_home
         else:
@@ -202,6 +202,10 @@ class BuiltInCommands:
     def thrawn_quit():
         sys.exit(0)
 
+    @staticmethod
+    def test():
+        print('test')
+
 
 class CommandLineEdit(QLineEdit):
     def __init__(self, parent, command_label, tconfig):
@@ -229,7 +233,6 @@ class CommandLineEdit(QLineEdit):
             self.command_run(completion_list[0])
         else:
             self.command_run(self.text())
-
 
     def command_run(self, command):
         os.popen(self.tconfig.terminal + ' ' +
