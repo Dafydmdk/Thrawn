@@ -6,8 +6,8 @@ from Xlib import X, XK, display
 from Xlib.ext import record
 from Xlib.protocol import rq
 from PyQt5.QtCore import Qt, QThread
-from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QLineEdit
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QLineEdit,
+                             QLabel)
 
 
 class ThrawnConfig:
@@ -16,7 +16,7 @@ class ThrawnConfig:
         self.tconfig_load()
 
     def tconfig_save_default(self):
-        self.tconfig_map = {'Terminal': 'xfce4-terminal',
+        self.tconfig_map = {'Terminal': 'gnome-terminal',
                             'Terminal exec option flag': '-x',
                             'Height': 24,
                             'Focus keys': ['Control_L', 'Shift_L']}
@@ -89,7 +89,7 @@ class ThrawnConfig:
                 logging.critical('HOME variable not defined')
                 sys.exit(1)
             else:
-                tconfig_path = home + '/.tconfig'
+                tconfig_path = home + '/.config'
         return tconfig_path
 
 
